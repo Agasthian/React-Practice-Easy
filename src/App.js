@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import {useState,useEffect} from 'react'
+import CardList from './components/card-list/card-list.components'
+import SearchBox from './components/search-box/search-box.component'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import './App.css'
+
+const App = () =>{
+
+  //useState
+  const [searchField,setSearchField] = useState ('')
+  const [monsters, setMonsters] = useState([])
+  const [filteredMonsters,setFilteredMonsters] = useState([monsters])
+
+  
+  //useEffect
+  useEffect(()=>{
+    fetch('https://jsonplaceholder.typicode.com/users')
+    .then((response)=> response.json())
+    .then( (users)=> setMonsters(users))
+  },[] )
+
+  useEffect(()=> {
+      const newFilteredMonsters = monsters.filter(
+        (monster)=>{ 
+          return  monster.name.toLowerCase().includes(searchField)//incldes check for char & returns boolean
+        }) //end of filter
+
+    setFilteredMonsters(newFilteredMonsters)
+  },[monsters,searchField])
+
+
+    const onSearchChange = (e)=> { //on change event handler - gets the typed char
+      const searchFieldString = e.target.value.toLowerCase() // saved to a seperate const value
+      //update state with search string data
+      setSearchField(searchFieldString)
+     }
+
+    
+
+  return(
+    <div className='App'>  
+      <h1 className='app-title'>Monsters Rolodex</h1>
+        <SearchBox
+          className='monsters-search-box'
+          placeholder='Search monsters'
+          onChangeHandler = {onSearchChange}
+        />
+        <CardList monsters={filteredMonsters}/>
+      </div>
+  )
 }
+
 
 export default App;
